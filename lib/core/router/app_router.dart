@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/providers/auth_state.dart';
 import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/register_screen.dart';
 import '../../features/customers/data/models/customer.dart';
 import '../../features/customers/screens/customer_detail_screen.dart';
 import '../../features/customers/screens/customer_form_screen.dart';
@@ -57,6 +58,7 @@ import '../../features/bankDetails/screens/bank_details_settings_screen.dart';
 abstract class AppRoutes {
   static const splash = '/';
   static const login = '/login';
+  static const register = '/register';
   static const dashboard = '/dashboard';
   static const products = '/products';
   static const inventory = '/inventory';
@@ -84,6 +86,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authNotifierProvider);
       final isLoginRoute = state.matchedLocation == AppRoutes.login;
+      // Signed-out screens: sign in, or ask to register a new business.
+      final isPublicRoute = isLoginRoute || state.matchedLocation == AppRoutes.register;
       final isSplashRoute = state.matchedLocation == AppRoutes.splash;
 
       return switch (authState) {
@@ -92,16 +96,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         AuthInitial() || AuthLoading() => isSplashRoute ? null : AppRoutes.splash,
 
         // Authenticated users never see the splash or login screens.
-        AuthAuthenticated() => (isSplashRoute || isLoginRoute) ? AppRoutes.dashboard : null,
+        AuthAuthenticated() => (isSplashRoute || isPublicRoute) ? AppRoutes.dashboard : null,
 
         // Unauthenticated (or a failed login attempt) always lands on
         // login — a protected route is never reachable without a session.
-        AuthUnauthenticated() || AuthError() => isLoginRoute ? null : AppRoutes.login,
+        AuthUnauthenticated() || AuthError() => isPublicRoute ? null : AppRoutes.login,
       };
     },
     routes: [
       GoRoute(path: AppRoutes.splash, builder: (context, state) => const SplashScreen()),
       GoRoute(path: AppRoutes.login, builder: (context, state) => const LoginScreen()),
+      GoRoute(path: AppRoutes.register, builder: (context, state) => const RegisterScreen()),
 
       // Bottom-nav tabs — each branch keeps its own navigation stack.
       StatefulShellRoute.indexedStack(

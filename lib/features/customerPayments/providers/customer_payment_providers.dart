@@ -23,13 +23,21 @@ class AddPaymentController extends AsyncNotifier<void> {
     required double amount,
     required String method,
     DateTime? paymentDate,
+    String? referenceNumber,
     String? notes,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
       () => ref
           .read(customerPaymentApiProvider)
-          .recordPayment(saleId: saleId, amount: amount, method: method, paymentDate: paymentDate, notes: notes),
+          .recordPayment(
+            saleId: saleId,
+            amount: amount,
+            method: method,
+            paymentDate: paymentDate,
+            referenceNumber: referenceNumber,
+            notes: notes,
+          ),
     );
     final success = !state.hasError;
     if (success) {
@@ -38,9 +46,12 @@ class AddPaymentController extends AsyncNotifier<void> {
       // invalidated (contrast with sale/purchase submit(), which also
       // invalidates inventoryListProvider/ledgerProvider).
       ref.invalidate(saleDetailProvider(saleId));
-      ref.invalidate(customerDetailProvider(customerId));
-      ref.invalidate(customerSalesHistoryProvider(customerId));
-      ref.invalidate(customerPaymentHistoryProvider(customerId));
+      ref.invalidate(saleListProvider);
+      if (customerId.isNotEmpty) {
+        ref.invalidate(customerDetailProvider(customerId));
+        ref.invalidate(customerSalesHistoryProvider(customerId));
+        ref.invalidate(customerPaymentHistoryProvider(customerId));
+      }
     }
     return success;
   }

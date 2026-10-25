@@ -13,6 +13,7 @@ import '../../../core/widgets/loading_indicator.dart';
 import '../data/models/business_settings.dart';
 import '../providers/business_settings_providers.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/utils/page_padding.dart';
 
 class BusinessSettingsScreen extends ConsumerStatefulWidget {
   const BusinessSettingsScreen({super.key});
@@ -119,7 +120,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
           return Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: pagePadding(context),
               children: [
                 Text(
                   'These details and your logo are printed on every sale and purchase invoice.',

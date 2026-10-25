@@ -12,6 +12,7 @@ import '../data/models/product.dart';
 import '../data/models/unit.dart';
 import '../providers/product_providers.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/utils/page_padding.dart';
 
 /// Handles both "add" (existing == null) and "edit" (existing != null) —
 /// same fields, same validation, just a different submit action and title.
@@ -30,8 +31,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   late final _nameController = TextEditingController(text: widget.existing?.name);
   late final _skuController = TextEditingController(text: widget.existing?.sku);
   late final _minStockController = TextEditingController(text: widget.existing?.lowStockThreshold.toString());
-  late final _purchasePriceController = TextEditingController(text: widget.existing?.purchasePrice.toString());
-  late final _sellingPriceController = TextEditingController(text: widget.existing?.sellingPrice.toString());
   late final _descriptionController = TextEditingController(text: widget.existing?.description);
   late final _hsnCodeController = TextEditingController(text: widget.existing?.hsnCode);
 
@@ -46,8 +45,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     _nameController.dispose();
     _skuController.dispose();
     _minStockController.dispose();
-    _purchasePriceController.dispose();
-    _sellingPriceController.dispose();
     _descriptionController.dispose();
     _hsnCodeController.dispose();
     super.dispose();
@@ -90,8 +87,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     final name = _nameController.text.trim();
     final sku = _skuController.text.trim();
     final minStock = double.parse(_minStockController.text);
-    final purchasePrice = double.tryParse(_purchasePriceController.text);
-    final sellingPrice = double.tryParse(_sellingPriceController.text);
     final description = _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim();
     final hsnCode = _hsnCodeController.text.trim().isEmpty ? null : _hsnCodeController.text.trim();
 
@@ -103,8 +98,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             categoryId: _selectedCategory!.id,
             unitId: _selectedUnit!.id,
             lowStockThreshold: minStock,
-            purchasePrice: purchasePrice,
-            sellingPrice: sellingPrice,
             description: description,
             hsnCode: hsnCode,
           )
@@ -114,8 +107,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 categoryId: _selectedCategory!.id,
                 unitId: _selectedUnit!.id,
                 lowStockThreshold: minStock,
-                purchasePrice: purchasePrice,
-                sellingPrice: sellingPrice,
                 description: description,
                 hsnCode: hsnCode,
               )) !=
@@ -151,7 +142,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: pagePadding(context),
           children: [
             AppTextField(
               label: 'Product Name *',
@@ -200,20 +191,6 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 }
                 return null;
               },
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              label: 'Purchase Price',
-              controller: _purchasePriceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              enabled: !isSubmitting,
-            ),
-            const SizedBox(height: 12),
-            AppTextField(
-              label: 'Selling Price',
-              controller: _sellingPriceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              enabled: !isSubmitting,
             ),
             const SizedBox(height: 12),
             AppTextField(label: 'Description', controller: _descriptionController, enabled: !isSubmitting),

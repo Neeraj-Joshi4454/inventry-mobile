@@ -3,14 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
-import '../../../core/widgets/filter_chip_bar.dart';
 import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/gst_rate_selector.dart';
-import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/payment_section.dart';
 import '../../customers/data/models/customer.dart';
 import '../../customers/providers/customer_providers.dart';
 import '../../inventory/widgets/product_picker_page.dart';
@@ -147,6 +145,7 @@ class _CreateSaleScreenState extends ConsumerState<CreateSaleScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createSaleControllerProvider);
+    final notifier = ref.read(createSaleControllerProvider.notifier);
 
     return Scaffold(
       appBar: BrandAppBar(title: const Text('New Sale')),
@@ -194,7 +193,7 @@ class _CreateSaleScreenState extends ConsumerState<CreateSaleScreen> {
               child: Column(
                 children: [
                   _TotalRow(label: 'Subtotal', value: state.subTotal),
-                  _TotalRow(label: 'Discount', value: -state.discountAmount),
+                  _TotalRow(label: 'Discount', value: -state.effectiveDiscount),
                   _TotalRow(label: 'Tax', value: state.taxAmount),
                   const Divider(height: 20),
                   _TotalRow(label: 'Grand Total', value: state.grandTotal, emphasize: true),
@@ -203,10 +202,32 @@ class _CreateSaleScreenState extends ConsumerState<CreateSaleScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          _PaymentSection(
-            state: state,
+          PaymentSection(
+            noun: 'sale',
+            question: 'How is the customer paying for this sale?',
+            directSubtitle: 'Paid in full now',
+            creditSubtitle: 'Customer pays later',
+            paidLabel: 'received',
+            dueLabel: 'Amount due from customer',
+            type: state.saleType,
+            onTypeChanged: notifier.setSaleType,
+            grandTotal: state.grandTotal,
+            paidAmount: state.paidAmount,
+            remainingAmount: state.remainingAmount,
+            previewStatus: state.previewPaymentStatus,
+            advanceExceedsTotal: state.advanceExceedsTotal,
             advanceController: _advanceController,
+            onAdvanceChanged: notifier.setAdvanceAmount,
+            paymentMode: state.paymentMode,
+            onModeChanged: notifier.setPaymentMode,
             referenceController: _referenceController,
+            onReferenceChanged: notifier.setPaymentReference,
+            // The customer pays into the business's own UPI / bank account.
+            modeDetails: (mode, amount) => switch (mode) {
+              'UPI' => UpiQrPanel(amount: amount),
+              'BANK_TRANSFER' => BankDetailsPanel(amount: amount),
+              _ => null,
+            },
           ),
         ],
       ),
@@ -502,241 +523,6 @@ class _TotalRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-String paymentModeLabel(String mode) => switch (mode) {
-  'CASH' => 'Cash',
-  'UPI' => 'UPI',
-  'BANK_TRANSFER' => 'Bank transfer',
-  'CARD' => 'Card',
-  'CREDIT' => 'Credit',
-  _ => mode,
-};
-
-/// Payment step of a sale: first a required choice between a direct
-/// (paid-in-full) sale and a credit sale, then the details that choice
-/// needs — payment mode and transaction reference for money received, and
-/// an optional advance plus the amount due for credit.
-class _PaymentSection extends ConsumerWidget {
-  const _PaymentSection({required this.state, required this.advanceController, required this.referenceController});
-
-  final CreateSaleState state;
-  final TextEditingController advanceController;
-  final TextEditingController referenceController;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(createSaleControllerProvider.notifier);
-    final textTheme = Theme.of(context).textTheme;
-    final saleType = state.saleType;
-    final receivingMoney = state.paidAmount > 0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Expanded(child: Text('Payment', style: textTheme.titleMedium)),
-            if (saleType != null) PaymentStatusBadge(status: state.previewPaymentStatus),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text('How is the customer paying for this sale?', style: textTheme.bodySmall),
-        const SizedBox(height: AppSpacing.md),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _SaleTypeOption(
-                icon: Icons.payments_outlined,
-                title: 'Direct sale',
-                subtitle: 'Paid in full now',
-                selected: saleType == SaleType.direct,
-                onTap: () => notifier.setSaleType(SaleType.direct),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: _SaleTypeOption(
-                icon: Icons.schedule_outlined,
-                title: 'Credit sale',
-                subtitle: 'Customer pays later',
-                selected: saleType == SaleType.credit,
-                onTap: () => notifier.setSaleType(SaleType.credit),
-              ),
-            ),
-          ],
-        ),
-        if (saleType == SaleType.credit) ...[
-          const SizedBox(height: AppSpacing.lg),
-          TextField(
-            controller: advanceController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: 'Advance received now (optional)',
-              prefixText: '₹ ',
-              helperText: state.advanceExceedsTotal ? null : 'Leave empty if nothing is paid today',
-              errorText: state.advanceExceedsTotal ? 'Advance cannot be more than the grand total' : null,
-            ),
-            onChanged: (value) => notifier.setAdvanceAmount(double.tryParse(value) ?? 0),
-          ),
-        ],
-        if (saleType != null && receivingMoney) ...[
-          const SizedBox(height: AppSpacing.lg),
-          Text(saleType == SaleType.direct ? 'Payment mode' : 'Advance paid via', style: textTheme.labelLarge),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              for (final mode in salePaymentModes)
-                AppFilterChip(
-                  label: paymentModeLabel(mode),
-                  selected: state.paymentMode == mode,
-                  onSelected: () => notifier.setPaymentMode(mode),
-                ),
-            ],
-          ),
-          if (state.paymentMode == 'UPI') ...[
-            const SizedBox(height: AppSpacing.md),
-            UpiQrPanel(amount: state.paidAmount),
-          ],
-          if (state.paymentMode == 'BANK_TRANSFER') ...[
-            const SizedBox(height: AppSpacing.md),
-            BankDetailsPanel(amount: state.paidAmount),
-          ],
-          if (state.paymentMode != 'CASH') ...[
-            const SizedBox(height: AppSpacing.md),
-            TextField(
-              controller: referenceController,
-              textCapitalization: TextCapitalization.characters,
-              decoration: InputDecoration(labelText: _referenceLabel(state.paymentMode)),
-              onChanged: notifier.setPaymentReference,
-            ),
-          ],
-        ],
-        if (saleType != null) ...[
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                children: [
-                  _TotalRow(label: 'Grand Total', value: state.grandTotal),
-                  _TotalRow(
-                    label: saleType == SaleType.direct ? 'Amount received' : 'Advance received',
-                    value: state.paidAmount,
-                  ),
-                  const Divider(height: 20),
-                  _AmountDueRow(amount: state.remainingAmount),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  static String _referenceLabel(String mode) => switch (mode) {
-    'UPI' => 'UPI transaction ID (optional)',
-    'BANK_TRANSFER' => 'UTR / bank reference (optional)',
-    'CARD' => 'Card slip / approval no. (optional)',
-    _ => 'Reference (optional)',
-  };
-}
-
-class _SaleTypeOption extends StatelessWidget {
-  const _SaleTypeOption({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final radius = BorderRadius.circular(AppRadius.lg);
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: Material(
-        color: selected ? scheme.primaryContainer : scheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: radius,
-          side: BorderSide(color: selected ? scheme.primary : scheme.outlineVariant, width: selected ? 1.5 : 1),
-        ),
-        child: InkWell(
-          borderRadius: radius,
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      icon,
-                      size: AppSizes.icon,
-                      color: selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
-                    ),
-                    const Spacer(),
-                    Icon(
-                      selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                      size: AppSizes.iconSm,
-                      color: selected ? scheme.primary : scheme.outline,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(title, style: Theme.of(context).textTheme.titleSmall),
-                const SizedBox(height: 2),
-                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AmountDueRow extends StatelessWidget {
-  const _AmountDueRow({required this.amount});
-
-  final double amount;
-
-  @override
-  Widget build(BuildContext context) {
-    final due = amount > 0.005;
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            due ? 'Amount due from customer' : 'Amount due',
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-          ),
-        ),
-        Text(
-          Formatters.currency(amount),
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-            color: due ? AppColors.warning : AppColors.success,
-          ),
-        ),
-      ],
     );
   }
 }

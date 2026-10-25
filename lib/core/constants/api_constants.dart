@@ -1,28 +1,17 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
-
 /// Central place for API configuration. The base URL is overridable at
-/// build/run time via `--dart-define=API_BASE_URL=...` (e.g. for a staging
-/// server or a physical device on the same network) — never hard-code a
-/// single URL that only works from one environment.
+/// build/run time via `--dart-define=API_BASE_URL=...` (e.g. for a local
+/// backend: `http://10.0.2.2:4000/api/v1` on the Android emulator, or
+/// `http://localhost:4000/api/v1` on iOS simulator / macOS / web).
 class ApiConstants {
   ApiConstants._();
 
   static const String _override = String.fromEnvironment('API_BASE_URL');
 
-  /// Sensible per-platform dev defaults:
-  /// - Android emulator can't reach the host machine via `localhost` (it has
-  ///   its own network namespace) — `10.0.2.2` is the documented alias for
-  ///   the host loopback interface.
-  /// - iOS simulator, macOS, and web all share the host's network stack, so
-  ///   `localhost` works directly.
-  static String get baseUrl {
-    if (_override.isNotEmpty) return _override;
-    if (!kIsWeb && Platform.isAndroid) {
-      return 'http://10.0.2.2:4000/api/v1';
-    }
-    return 'http://localhost:4000/api/v1';
-  }
+  static const String _production =
+      'https://inventry-backend-yy05.onrender.com/api/v1';
+
+  static String get baseUrl =>
+      _override.isNotEmpty ? _override : _production;
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 15);
@@ -33,4 +22,7 @@ class ApiConstants {
   static const String refresh = '/auth/refresh';
   static const String logout = '/auth/logout';
   static const String me = '/auth/me';
+
+  /// Public: a new business asks to join; an admin approves it.
+  static const String registrations = '/registrations';
 }

@@ -49,6 +49,20 @@ ApiException mapDioException(DioException error) {
   }
 }
 
+/// The backend's request validation answers a generic "Validation failed"
+/// plus an `errors: [{ field, message }]` list naming what was actually
+/// wrong — surface those messages so the user knows what to fix.
+String? _fieldErrorsMessage(Object? data) {
+  final errors = data is Map ? data['errors'] : null;
+  if (errors is! List) return null;
+  final messages = errors
+      .map((e) => e is Map ? e['message'] : null)
+      .whereType<String>()
+      .where((m) => m.isNotEmpty)
+      .toSet();
+  return messages.isEmpty ? null : messages.join('\n');
+}
+
 ApiException _mapBadResponse(DioException error) {
   final statusCode = error.response?.statusCode;
   final data = error.response?.data;
@@ -57,7 +71,10 @@ ApiException _mapBadResponse(DioException error) {
   switch (statusCode) {
     case 400:
       return ApiException(
-        message: backendMessage ?? 'That request was invalid. Please check the details and try again.',
+        message:
+            _fieldErrorsMessage(data) ??
+            backendMessage ??
+            'That request was invalid. Please check the details and try again.',
         type: ApiErrorType.validation,
         statusCode: statusCode,
       );

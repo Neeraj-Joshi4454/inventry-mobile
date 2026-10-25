@@ -108,8 +108,9 @@ class ProfitSummaryScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'Cost of goods sold is estimated using each product\'s current purchase price, '
-          'not the historical cost at the time of each sale.',
+          'All amounts exclude GST. Cost of goods sold is each sold item\'s quantity × its '
+          'average purchase cost across all your purchases (or the product\'s purchase price '
+          'if it was never purchased).',
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ],

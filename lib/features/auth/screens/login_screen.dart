@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/router/app_router.dart';
 
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
@@ -102,6 +105,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     AppButton(label: 'Sign In', onPressed: _submit, isLoading: isLoading),
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('New here?')),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: isLoading ? null : () => context.push(AppRoutes.register),
+                      icon: const Icon(Icons.storefront_outlined),
+                      label: const Text('Register your business'),
+                      style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                    ),
                   ],
                 ),
               ),

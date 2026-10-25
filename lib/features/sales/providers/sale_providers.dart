@@ -1,10 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/utils/document_totals.dart';
+import '../../../core/widgets/payment_section.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../customerPayments/data/models/customer_payment.dart';
 import '../../customers/providers/customer_providers.dart';
 import '../../inventory/providers/inventory_providers.dart';
+import '../../taxes/data/models/tax_config.dart';
+import '../../taxes/providers/tax_providers.dart';
 import '../data/models/sale.dart';
 import '../data/models/sale_invoice.dart';
 import '../data/models/sale_item.dart';
@@ -70,6 +74,7 @@ class SaleListState {
 
 const _unset = Object();
 
+
 class SaleListNotifier extends Notifier<SaleListState> {
   @override
   SaleListState build() {
@@ -131,7 +136,11 @@ class SaleListNotifier extends Notifier<SaleListState> {
   }
 
   void setDateRange(DateTime? from, DateTime? to) {
-    state = state.copyWith(fromDate: from, toDate: to);
+    // Inclusive of the whole last day — the picker gives its midnight start.
+    state = state.copyWith(
+      fromDate: from,
+      toDate: to == null ? null : DateTime(to.year, to.month, to.day, 23, 59, 59, 999),
+    );
     refresh();
   }
 
@@ -160,20 +169,11 @@ final saleInvoiceProvider = FutureProvider.family<SaleInvoice, String>(
 // Create Sale form
 // ---------------------------------------------------------------------------
 
-/// How the customer is settling this sale. Deliberately has no default on
-/// the form: the user must choose, so a sale is never silently saved as
-/// credit.
-enum SaleType {
-  /// Paid in full now — amount received is the grand total.
-  direct,
+/// How the customer is settling this sale — shared with purchases (see
+/// core/widgets/payment_section.dart).
+typedef SaleType = PaymentType;
 
-  /// Customer pays later; an optional advance can be taken now.
-  credit,
-}
-
-/// Ways money can actually be received. Credit is a sale type, not a
-/// payment mode, so it's deliberately absent here.
-const salePaymentModes = ['CASH', 'UPI', 'BANK_TRANSFER', 'CARD'];
+const salePaymentModes = paymentModes;
 
 class CreateSaleState {
   const CreateSaleState({
@@ -190,7 +190,12 @@ class CreateSaleState {
     this.isSubmitting = false,
     this.errorMessage,
     this.lastResult,
+    this.gstEnabled = true,
   }) : _saleDate = saleDate;
+
+  /// The tenant's GST switch (false also for taxType NO_TAX) — when off the
+  /// backend ignores every line's taxRate.
+  final bool gstEnabled;
 
   final String? customerId;
   final String? customerName;
@@ -208,17 +213,20 @@ class CreateSaleState {
 
   DateTime get saleDate => _saleDate ?? DateTime.now();
 
-  double get subTotal => lines.fold(0, (sum, line) => sum + line.lineSubTotal);
-  double get taxAmount => lines.fold(0, (sum, line) => sum + line.lineTax);
-  double get grandTotal => subTotal + taxAmount - discountAmount;
+  DocumentTotals get _totals => computeDocumentTotals(
+    [for (final l in lines) (quantity: l.quantity ?? 0, unitPrice: l.unitPrice ?? 0, taxRate: l.taxRate)],
+    discountAmount: discountAmount,
+    gstEnabled: gstEnabled,
+  );
+
+  double get subTotal => _totals.subTotal;
+  double get effectiveDiscount => _totals.discount;
+  double get taxAmount => _totals.tax;
+  double get grandTotal => _totals.total;
 
   /// Money received now: the full total for a direct sale, the advance
   /// (possibly zero) for a credit sale.
-  double get paidAmount => switch (saleType) {
-    SaleType.direct => grandTotal > 0 ? grandTotal : 0,
-    SaleType.credit => advanceAmount,
-    null => 0,
-  };
+  double get paidAmount => paidNow(saleType, grandTotal: grandTotal, advance: advanceAmount);
 
   /// What the backend stores as the sale's payment method: the mode money
   /// was received in, or CREDIT when nothing was received.
@@ -229,11 +237,8 @@ class CreateSaleState {
   /// Live preview of what the backend will compute — mirrors
   /// sale.service.ts::createSale's status logic so the screen shows the
   /// same PAID/PARTIAL/CREDIT the sale will actually be saved with.
-  String get previewPaymentStatus {
-    if (paidAmount <= 0) return 'CREDIT';
-    if (remainingAmount <= 0.005) return 'PAID';
-    return 'PARTIAL';
-  }
+  String get previewPaymentStatus =>
+      previewStatusFor(paid: paidAmount, remaining: remainingAmount, unpaidStatus: 'CREDIT');
 
   bool get advanceExceedsTotal => saleType == SaleType.credit && advanceAmount > grandTotal + 0.005;
 
@@ -259,8 +264,10 @@ class CreateSaleState {
     bool? isSubmitting,
     Object? errorMessage = _unset,
     Object? lastResult = _unset,
+    bool? gstEnabled,
   }) {
     return CreateSaleState(
+      gstEnabled: gstEnabled ?? this.gstEnabled,
       customerId: customerId == _unset ? this.customerId : customerId as String?,
       customerName: customerName == _unset ? this.customerName : customerName as String?,
       saleDate: saleDate ?? _saleDate,
@@ -308,7 +315,18 @@ class CreatedSaleSummary {
 
 class CreateSaleController extends AutoDisposeNotifier<CreateSaleState> {
   @override
-  CreateSaleState build() => const CreateSaleState();
+  CreateSaleState build() {
+    // listen, not watch: the config loading must not rebuild (and so wipe)
+    // a half-filled form.
+    ref.listen<AsyncValue<TaxConfig>>(taxConfigProvider, (_, next) {
+      final config = next.valueOrNull;
+      if (config != null) state = state.copyWith(gstEnabled: _isGstOn(config));
+    });
+    final config = ref.read(taxConfigProvider).valueOrNull;
+    return CreateSaleState(gstEnabled: config == null || _isGstOn(config));
+  }
+
+  static bool _isGstOn(TaxConfig config) => config.gstEnabled && config.taxType != 'NO_TAX';
 
   void setCustomer(String id, String name) {
     state = state.copyWith(customerId: id, customerName: name);
@@ -424,6 +442,11 @@ class CreateSaleController extends AutoDisposeNotifier<CreateSaleState> {
       return true;
     } on ApiException catch (e) {
       state = state.copyWith(isSubmitting: false, errorMessage: e.message);
+      return false;
+    } catch (_) {
+      // e.g. an unexpected response shape — without this the button would
+      // stay stuck on its spinner with no feedback.
+      state = state.copyWith(isSubmitting: false, errorMessage: 'Could not create the sale. Please try again.');
       return false;
     }
   }

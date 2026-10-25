@@ -13,6 +13,7 @@ class CustomerPaymentApi {
     required double amount,
     required String method,
     DateTime? paymentDate,
+    String? referenceNumber,
     String? notes,
   }) async {
     try {
@@ -23,6 +24,7 @@ class CustomerPaymentApi {
           'amount': amount,
           'method': method,
           if (paymentDate != null) 'paymentDate': paymentDate.toIso8601String(),
+          'referenceNumber': ?referenceNumber,
           'notes': ?notes,
         },
       );

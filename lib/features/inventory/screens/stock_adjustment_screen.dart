@@ -12,6 +12,7 @@ import '../data/models/inventory_item.dart';
 import '../providers/inventory_providers.dart';
 import '../widgets/product_picker_page.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/utils/page_padding.dart';
 
 /// Reached either from the Inventory list (no product preselected — the
 /// user picks one, seeing its current stock inline) or from a Product
@@ -161,7 +162,7 @@ class _StockAdjustmentScreenState extends ConsumerState<StockAdjustmentScreen> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: pagePadding(context),
         children: [
           Card(
             child: Padding(

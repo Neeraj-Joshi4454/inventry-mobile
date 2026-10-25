@@ -8,6 +8,7 @@ import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/storage/local_image_provider.dart';
 import '../../../core/storage/pick_local_image.dart';
+import '../../../core/utils/page_padding.dart';
 
 /// Settings → UPI QR code. The owner uploads their payment QR once; the
 /// New Sale screen shows it whenever UPI is chosen as the payment mode.
@@ -47,7 +48,7 @@ class _UpiQrSettingsScreenState extends ConsumerState<UpiQrSettingsScreen> {
     return Scaffold(
       appBar: const BrandAppBar(title: Text('UPI QR code')),
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: pagePadding(context, all: AppSpacing.lg),
         children: [
           Text(
             'Upload the UPI QR code customers scan to pay you. It appears on the New Sale screen when UPI is '

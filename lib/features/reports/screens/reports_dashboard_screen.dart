@@ -77,7 +77,7 @@ class ReportsDashboardScreen extends ConsumerWidget {
                 _ReportTile(
                   icon: Icons.shopping_cart_outlined,
                   title: 'Purchase Report',
-                  subtitle: 'Spend, quantity purchased and tax',
+                  subtitle: 'Spend and tax',
                   onTap: () => context.push('/reports/purchases'),
                 ),
                 _ReportTile(

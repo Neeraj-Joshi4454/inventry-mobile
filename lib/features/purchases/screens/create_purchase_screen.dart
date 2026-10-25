@@ -8,6 +8,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/gst_rate_selector.dart';
+import '../../../core/widgets/payment_section.dart';
 import '../../inventory/widgets/product_picker_page.dart';
 import '../../suppliers/data/models/supplier.dart';
 import '../../suppliers/providers/supplier_providers.dart';
@@ -28,6 +29,8 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
   final _discountController = TextEditingController(text: '0');
   final _notesController = TextEditingController();
   final _invoiceNumberController = TextEditingController();
+  final _advanceController = TextEditingController();
+  final _referenceController = TextEditingController();
 
   @override
   void dispose() {
@@ -40,6 +43,8 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
     _discountController.dispose();
     _notesController.dispose();
     _invoiceNumberController.dispose();
+    _advanceController.dispose();
+    _referenceController.dispose();
     super.dispose();
   }
 
@@ -107,6 +112,7 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createPurchaseControllerProvider);
+    final notifier = ref.read(createPurchaseControllerProvider.notifier);
 
     return Scaffold(
       appBar: BrandAppBar(title: const Text('New Purchase')),
@@ -139,11 +145,11 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
           else
             for (var i = 0; i < state.lines.length; i++) _buildLineCard(state.lines[i], i),
           const SizedBox(height: 20),
-          AppTextField(
-            label: 'Discount Amount',
+          TextField(
             controller: _discountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onFieldSubmitted: (_) {},
+            decoration: const InputDecoration(labelText: 'Discount Amount'),
+            onChanged: (value) => notifier.setDiscount(double.tryParse(value) ?? 0),
           ),
           const SizedBox(height: 12),
           AppTextField(label: 'Notes (optional)', controller: _notesController),
@@ -154,13 +160,35 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
               child: Column(
                 children: [
                   _TotalRow(label: 'Subtotal', value: state.subTotal),
-                  _TotalRow(label: 'Discount', value: -state.discountAmount),
+                  _TotalRow(label: 'Discount', value: -state.effectiveDiscount),
                   _TotalRow(label: 'Tax', value: state.taxAmount),
                   const Divider(height: 20),
                   _TotalRow(label: 'Grand Total', value: state.grandTotal, emphasize: true),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 20),
+          PaymentSection(
+            noun: 'purchase',
+            question: 'How are you paying the supplier for this purchase?',
+            directSubtitle: 'Paid in full now',
+            creditSubtitle: 'Pay supplier later',
+            paidLabel: 'paid',
+            dueLabel: 'Amount due to supplier',
+            type: state.paymentType,
+            onTypeChanged: notifier.setPaymentType,
+            grandTotal: state.grandTotal,
+            paidAmount: state.paidAmount,
+            remainingAmount: state.remainingAmount,
+            previewStatus: state.previewPaymentStatus,
+            advanceExceedsTotal: state.advanceExceedsTotal,
+            advanceController: _advanceController,
+            onAdvanceChanged: notifier.setAdvanceAmount,
+            paymentMode: state.paymentMode,
+            onModeChanged: notifier.setPaymentMode,
+            referenceController: _referenceController,
+            onReferenceChanged: notifier.setPaymentReference,
           ),
         ],
       ),
@@ -172,9 +200,6 @@ class _CreatePurchaseScreenState extends ConsumerState<CreatePurchaseScreen> {
             isLoading: state.isSubmitting,
             onPressed: state.canSubmit
                 ? () {
-                    ref
-                        .read(createPurchaseControllerProvider.notifier)
-                        .setDiscount(double.tryParse(_discountController.text) ?? 0);
                     ref
                         .read(createPurchaseControllerProvider.notifier)
                         .setNotes(_notesController.text.trim().isEmpty ? null : _notesController.text.trim());

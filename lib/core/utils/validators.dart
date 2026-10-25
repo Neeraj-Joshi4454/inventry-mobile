@@ -22,4 +22,12 @@ class Validators {
     if (value == null || value.isEmpty) return 'Enter your password';
     return null;
   }
+
+  /// For choosing a password (registration) — mirrors the backend's
+  /// minimum length; the backend still rejects common weak passwords.
+  static String? newPassword(String? value) {
+    if (value == null || value.isEmpty) return 'Choose a password';
+    if (value.length < 8) return 'Use at least 8 characters';
+    return null;
+  }
 }

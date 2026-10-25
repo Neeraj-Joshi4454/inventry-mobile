@@ -10,6 +10,7 @@ import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../data/bank_details.dart';
 import '../providers/bank_details_provider.dart';
+import '../../../core/utils/page_padding.dart';
 
 /// Settings → Bank details. Shown on New Sale when Bank transfer is chosen.
 class BankDetailsSettingsScreen extends ConsumerStatefulWidget {
@@ -89,7 +90,7 @@ class _BankDetailsSettingsScreenState extends ConsumerState<BankDetailsSettingsS
                 return Form(
                   key: _formKey,
                   child: ListView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: pagePadding(context, all: AppSpacing.lg),
                     children: [
                       Text(
                         'Shown to customers on New Sale when they pay by bank transfer. '

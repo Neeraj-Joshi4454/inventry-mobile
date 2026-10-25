@@ -11,6 +11,7 @@ import '../data/models/expense_category.dart';
 import '../providers/expense_category_providers.dart';
 import '../providers/expense_providers.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/utils/page_padding.dart';
 
 const _paymentMethods = ['CASH', 'UPI', 'BANK_TRANSFER', 'CARD', 'OTHER'];
 
@@ -171,7 +172,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: pagePadding(context),
           children: [
             AppTextField(
               label: 'Expense Title',

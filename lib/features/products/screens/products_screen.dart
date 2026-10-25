@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_tokens.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_view.dart';
@@ -145,30 +144,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             title: product.name,
             subtitle: '${product.sku} · ${product.category.name}',
             onTap: () => context.push('/inventory/${product.id}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        Formatters.currency(product.sellingPrice),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                      ),
-                      Text('Selling price', style: Theme.of(context).textTheme.bodySmall),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: AppSizes.iconSm),
-                  tooltip: 'Edit product',
-                  onPressed: () => context.push('/products/${product.id}/edit', extra: product),
-                ),
-              ],
+            // No price here: rates are entered per purchase/sale, not on the product.
+            trailing: IconButton(
+              icon: const Icon(Icons.edit_outlined, size: AppSizes.iconSm),
+              tooltip: 'Edit product',
+              onPressed: () => context.push('/products/${product.id}/edit', extra: product),
             ),
           );
         },

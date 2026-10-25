@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Purchase {
 
- String get id; String get purchaseNumber; String? get invoiceNumber; String get supplierName; DateTime get purchaseDate; double get subTotal; double get discountAmount; double get taxableAmount; double get cgstAmount; double get sgstAmount; double get igstAmount; double get taxAmount; String get taxType; double get totalAmount; String get paymentStatus; String? get notes; String? get createdByName;
+ String get id; String get purchaseNumber; String? get invoiceNumber; String? get supplierId; String get supplierName; DateTime get purchaseDate; double get subTotal; double get discountAmount; double get taxableAmount; double get cgstAmount; double get sgstAmount; double get igstAmount; double get taxAmount; String get taxType; double get totalAmount; double get paidAmount; double get dueAmount; String get paymentStatus; String? get paymentMethod; String? get paymentReference; String? get notes; String? get createdByName;
 /// Create a copy of Purchase
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $PurchaseCopyWith<Purchase> get copyWith => _$PurchaseCopyWithImpl<Purchase>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Purchase&&(identical(other.id, id) || other.id == id)&&(identical(other.purchaseNumber, purchaseNumber) || other.purchaseNumber == purchaseNumber)&&(identical(other.invoiceNumber, invoiceNumber) || other.invoiceNumber == invoiceNumber)&&(identical(other.supplierName, supplierName) || other.supplierName == supplierName)&&(identical(other.purchaseDate, purchaseDate) || other.purchaseDate == purchaseDate)&&(identical(other.subTotal, subTotal) || other.subTotal == subTotal)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.taxableAmount, taxableAmount) || other.taxableAmount == taxableAmount)&&(identical(other.cgstAmount, cgstAmount) || other.cgstAmount == cgstAmount)&&(identical(other.sgstAmount, sgstAmount) || other.sgstAmount == sgstAmount)&&(identical(other.igstAmount, igstAmount) || other.igstAmount == igstAmount)&&(identical(other.taxAmount, taxAmount) || other.taxAmount == taxAmount)&&(identical(other.taxType, taxType) || other.taxType == taxType)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdByName, createdByName) || other.createdByName == createdByName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Purchase&&(identical(other.id, id) || other.id == id)&&(identical(other.purchaseNumber, purchaseNumber) || other.purchaseNumber == purchaseNumber)&&(identical(other.invoiceNumber, invoiceNumber) || other.invoiceNumber == invoiceNumber)&&(identical(other.supplierId, supplierId) || other.supplierId == supplierId)&&(identical(other.supplierName, supplierName) || other.supplierName == supplierName)&&(identical(other.purchaseDate, purchaseDate) || other.purchaseDate == purchaseDate)&&(identical(other.subTotal, subTotal) || other.subTotal == subTotal)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.taxableAmount, taxableAmount) || other.taxableAmount == taxableAmount)&&(identical(other.cgstAmount, cgstAmount) || other.cgstAmount == cgstAmount)&&(identical(other.sgstAmount, sgstAmount) || other.sgstAmount == sgstAmount)&&(identical(other.igstAmount, igstAmount) || other.igstAmount == igstAmount)&&(identical(other.taxAmount, taxAmount) || other.taxAmount == taxAmount)&&(identical(other.taxType, taxType) || other.taxType == taxType)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.dueAmount, dueAmount) || other.dueAmount == dueAmount)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdByName, createdByName) || other.createdByName == createdByName));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,purchaseNumber,invoiceNumber,supplierName,purchaseDate,subTotal,discountAmount,taxableAmount,cgstAmount,sgstAmount,igstAmount,taxAmount,taxType,totalAmount,paymentStatus,notes,createdByName);
+int get hashCode => Object.hashAll([runtimeType,id,purchaseNumber,invoiceNumber,supplierId,supplierName,purchaseDate,subTotal,discountAmount,taxableAmount,cgstAmount,sgstAmount,igstAmount,taxAmount,taxType,totalAmount,paidAmount,dueAmount,paymentStatus,paymentMethod,paymentReference,notes,createdByName]);
 
 @override
 String toString() {
-  return 'Purchase(id: $id, purchaseNumber: $purchaseNumber, invoiceNumber: $invoiceNumber, supplierName: $supplierName, purchaseDate: $purchaseDate, subTotal: $subTotal, discountAmount: $discountAmount, taxableAmount: $taxableAmount, cgstAmount: $cgstAmount, sgstAmount: $sgstAmount, igstAmount: $igstAmount, taxAmount: $taxAmount, taxType: $taxType, totalAmount: $totalAmount, paymentStatus: $paymentStatus, notes: $notes, createdByName: $createdByName)';
+  return 'Purchase(id: $id, purchaseNumber: $purchaseNumber, invoiceNumber: $invoiceNumber, supplierId: $supplierId, supplierName: $supplierName, purchaseDate: $purchaseDate, subTotal: $subTotal, discountAmount: $discountAmount, taxableAmount: $taxableAmount, cgstAmount: $cgstAmount, sgstAmount: $sgstAmount, igstAmount: $igstAmount, taxAmount: $taxAmount, taxType: $taxType, totalAmount: $totalAmount, paidAmount: $paidAmount, dueAmount: $dueAmount, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, paymentReference: $paymentReference, notes: $notes, createdByName: $createdByName)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $PurchaseCopyWith<$Res>  {
   factory $PurchaseCopyWith(Purchase value, $Res Function(Purchase) _then) = _$PurchaseCopyWithImpl;
 @useResult
 $Res call({
- String id, String purchaseNumber, String? invoiceNumber, String supplierName, DateTime purchaseDate, double subTotal, double discountAmount, double taxableAmount, double cgstAmount, double sgstAmount, double igstAmount, double taxAmount, String taxType, double totalAmount, String paymentStatus, String? notes, String? createdByName
+ String id, String purchaseNumber, String? invoiceNumber, String? supplierId, String supplierName, DateTime purchaseDate, double subTotal, double discountAmount, double taxableAmount, double cgstAmount, double sgstAmount, double igstAmount, double taxAmount, String taxType, double totalAmount, double paidAmount, double dueAmount, String paymentStatus, String? paymentMethod, String? paymentReference, String? notes, String? createdByName
 });
 
 
@@ -62,11 +62,12 @@ class _$PurchaseCopyWithImpl<$Res>
 
 /// Create a copy of Purchase
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? purchaseNumber = null,Object? invoiceNumber = freezed,Object? supplierName = null,Object? purchaseDate = null,Object? subTotal = null,Object? discountAmount = null,Object? taxableAmount = null,Object? cgstAmount = null,Object? sgstAmount = null,Object? igstAmount = null,Object? taxAmount = null,Object? taxType = null,Object? totalAmount = null,Object? paymentStatus = null,Object? notes = freezed,Object? createdByName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? purchaseNumber = null,Object? invoiceNumber = freezed,Object? supplierId = freezed,Object? supplierName = null,Object? purchaseDate = null,Object? subTotal = null,Object? discountAmount = null,Object? taxableAmount = null,Object? cgstAmount = null,Object? sgstAmount = null,Object? igstAmount = null,Object? taxAmount = null,Object? taxType = null,Object? totalAmount = null,Object? paidAmount = null,Object? dueAmount = null,Object? paymentStatus = null,Object? paymentMethod = freezed,Object? paymentReference = freezed,Object? notes = freezed,Object? createdByName = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,purchaseNumber: null == purchaseNumber ? _self.purchaseNumber : purchaseNumber // ignore: cast_nullable_to_non_nullable
 as String,invoiceNumber: freezed == invoiceNumber ? _self.invoiceNumber : invoiceNumber // ignore: cast_nullable_to_non_nullable
+as String?,supplierId: freezed == supplierId ? _self.supplierId : supplierId // ignore: cast_nullable_to_non_nullable
 as String?,supplierName: null == supplierName ? _self.supplierName : supplierName // ignore: cast_nullable_to_non_nullable
 as String,purchaseDate: null == purchaseDate ? _self.purchaseDate : purchaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime,subTotal: null == subTotal ? _self.subTotal : subTotal // ignore: cast_nullable_to_non_nullable
@@ -78,8 +79,12 @@ as double,igstAmount: null == igstAmount ? _self.igstAmount : igstAmount // igno
 as double,taxAmount: null == taxAmount ? _self.taxAmount : taxAmount // ignore: cast_nullable_to_non_nullable
 as double,taxType: null == taxType ? _self.taxType : taxType // ignore: cast_nullable_to_non_nullable
 as String,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
+as double,dueAmount: null == dueAmount ? _self.dueAmount : dueAmount // ignore: cast_nullable_to_non_nullable
 as double,paymentStatus: null == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,paymentMethod: freezed == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as String?,paymentReference: freezed == paymentReference ? _self.paymentReference : paymentReference // ignore: cast_nullable_to_non_nullable
+as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdByName: freezed == createdByName ? _self.createdByName : createdByName // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -166,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String purchaseNumber,  String? invoiceNumber,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  String paymentStatus,  String? notes,  String? createdByName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String purchaseNumber,  String? invoiceNumber,  String? supplierId,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  double paidAmount,  double dueAmount,  String paymentStatus,  String? paymentMethod,  String? paymentReference,  String? notes,  String? createdByName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Purchase() when $default != null:
-return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paymentStatus,_that.notes,_that.createdByName);case _:
+return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierId,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paidAmount,_that.dueAmount,_that.paymentStatus,_that.paymentMethod,_that.paymentReference,_that.notes,_that.createdByName);case _:
   return orElse();
 
 }
@@ -187,10 +192,10 @@ return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplier
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String purchaseNumber,  String? invoiceNumber,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  String paymentStatus,  String? notes,  String? createdByName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String purchaseNumber,  String? invoiceNumber,  String? supplierId,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  double paidAmount,  double dueAmount,  String paymentStatus,  String? paymentMethod,  String? paymentReference,  String? notes,  String? createdByName)  $default,) {final _that = this;
 switch (_that) {
 case _Purchase():
-return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paymentStatus,_that.notes,_that.createdByName);case _:
+return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierId,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paidAmount,_that.dueAmount,_that.paymentStatus,_that.paymentMethod,_that.paymentReference,_that.notes,_that.createdByName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +212,10 @@ return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplier
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String purchaseNumber,  String? invoiceNumber,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  String paymentStatus,  String? notes,  String? createdByName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String purchaseNumber,  String? invoiceNumber,  String? supplierId,  String supplierName,  DateTime purchaseDate,  double subTotal,  double discountAmount,  double taxableAmount,  double cgstAmount,  double sgstAmount,  double igstAmount,  double taxAmount,  String taxType,  double totalAmount,  double paidAmount,  double dueAmount,  String paymentStatus,  String? paymentMethod,  String? paymentReference,  String? notes,  String? createdByName)?  $default,) {final _that = this;
 switch (_that) {
 case _Purchase() when $default != null:
-return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paymentStatus,_that.notes,_that.createdByName);case _:
+return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplierId,_that.supplierName,_that.purchaseDate,_that.subTotal,_that.discountAmount,_that.taxableAmount,_that.cgstAmount,_that.sgstAmount,_that.igstAmount,_that.taxAmount,_that.taxType,_that.totalAmount,_that.paidAmount,_that.dueAmount,_that.paymentStatus,_that.paymentMethod,_that.paymentReference,_that.notes,_that.createdByName);case _:
   return null;
 
 }
@@ -222,12 +227,13 @@ return $default(_that.id,_that.purchaseNumber,_that.invoiceNumber,_that.supplier
 
 
 class _Purchase implements Purchase {
-  const _Purchase({required this.id, required this.purchaseNumber, this.invoiceNumber, required this.supplierName, required this.purchaseDate, required this.subTotal, this.discountAmount = 0, this.taxableAmount = 0, this.cgstAmount = 0, this.sgstAmount = 0, this.igstAmount = 0, required this.taxAmount, this.taxType = 'NO_TAX', required this.totalAmount, required this.paymentStatus, this.notes, this.createdByName});
+  const _Purchase({required this.id, required this.purchaseNumber, this.invoiceNumber, this.supplierId, required this.supplierName, required this.purchaseDate, required this.subTotal, this.discountAmount = 0, this.taxableAmount = 0, this.cgstAmount = 0, this.sgstAmount = 0, this.igstAmount = 0, required this.taxAmount, this.taxType = 'NO_TAX', required this.totalAmount, this.paidAmount = 0, this.dueAmount = 0, required this.paymentStatus, this.paymentMethod, this.paymentReference, this.notes, this.createdByName});
   
 
 @override final  String id;
 @override final  String purchaseNumber;
 @override final  String? invoiceNumber;
+@override final  String? supplierId;
 @override final  String supplierName;
 @override final  DateTime purchaseDate;
 @override final  double subTotal;
@@ -239,7 +245,11 @@ class _Purchase implements Purchase {
 @override final  double taxAmount;
 @override@JsonKey() final  String taxType;
 @override final  double totalAmount;
+@override@JsonKey() final  double paidAmount;
+@override@JsonKey() final  double dueAmount;
 @override final  String paymentStatus;
+@override final  String? paymentMethod;
+@override final  String? paymentReference;
 @override final  String? notes;
 @override final  String? createdByName;
 
@@ -253,16 +263,16 @@ _$PurchaseCopyWith<_Purchase> get copyWith => __$PurchaseCopyWithImpl<_Purchase>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Purchase&&(identical(other.id, id) || other.id == id)&&(identical(other.purchaseNumber, purchaseNumber) || other.purchaseNumber == purchaseNumber)&&(identical(other.invoiceNumber, invoiceNumber) || other.invoiceNumber == invoiceNumber)&&(identical(other.supplierName, supplierName) || other.supplierName == supplierName)&&(identical(other.purchaseDate, purchaseDate) || other.purchaseDate == purchaseDate)&&(identical(other.subTotal, subTotal) || other.subTotal == subTotal)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.taxableAmount, taxableAmount) || other.taxableAmount == taxableAmount)&&(identical(other.cgstAmount, cgstAmount) || other.cgstAmount == cgstAmount)&&(identical(other.sgstAmount, sgstAmount) || other.sgstAmount == sgstAmount)&&(identical(other.igstAmount, igstAmount) || other.igstAmount == igstAmount)&&(identical(other.taxAmount, taxAmount) || other.taxAmount == taxAmount)&&(identical(other.taxType, taxType) || other.taxType == taxType)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdByName, createdByName) || other.createdByName == createdByName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Purchase&&(identical(other.id, id) || other.id == id)&&(identical(other.purchaseNumber, purchaseNumber) || other.purchaseNumber == purchaseNumber)&&(identical(other.invoiceNumber, invoiceNumber) || other.invoiceNumber == invoiceNumber)&&(identical(other.supplierId, supplierId) || other.supplierId == supplierId)&&(identical(other.supplierName, supplierName) || other.supplierName == supplierName)&&(identical(other.purchaseDate, purchaseDate) || other.purchaseDate == purchaseDate)&&(identical(other.subTotal, subTotal) || other.subTotal == subTotal)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.taxableAmount, taxableAmount) || other.taxableAmount == taxableAmount)&&(identical(other.cgstAmount, cgstAmount) || other.cgstAmount == cgstAmount)&&(identical(other.sgstAmount, sgstAmount) || other.sgstAmount == sgstAmount)&&(identical(other.igstAmount, igstAmount) || other.igstAmount == igstAmount)&&(identical(other.taxAmount, taxAmount) || other.taxAmount == taxAmount)&&(identical(other.taxType, taxType) || other.taxType == taxType)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.paidAmount, paidAmount) || other.paidAmount == paidAmount)&&(identical(other.dueAmount, dueAmount) || other.dueAmount == dueAmount)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdByName, createdByName) || other.createdByName == createdByName));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,purchaseNumber,invoiceNumber,supplierName,purchaseDate,subTotal,discountAmount,taxableAmount,cgstAmount,sgstAmount,igstAmount,taxAmount,taxType,totalAmount,paymentStatus,notes,createdByName);
+int get hashCode => Object.hashAll([runtimeType,id,purchaseNumber,invoiceNumber,supplierId,supplierName,purchaseDate,subTotal,discountAmount,taxableAmount,cgstAmount,sgstAmount,igstAmount,taxAmount,taxType,totalAmount,paidAmount,dueAmount,paymentStatus,paymentMethod,paymentReference,notes,createdByName]);
 
 @override
 String toString() {
-  return 'Purchase(id: $id, purchaseNumber: $purchaseNumber, invoiceNumber: $invoiceNumber, supplierName: $supplierName, purchaseDate: $purchaseDate, subTotal: $subTotal, discountAmount: $discountAmount, taxableAmount: $taxableAmount, cgstAmount: $cgstAmount, sgstAmount: $sgstAmount, igstAmount: $igstAmount, taxAmount: $taxAmount, taxType: $taxType, totalAmount: $totalAmount, paymentStatus: $paymentStatus, notes: $notes, createdByName: $createdByName)';
+  return 'Purchase(id: $id, purchaseNumber: $purchaseNumber, invoiceNumber: $invoiceNumber, supplierId: $supplierId, supplierName: $supplierName, purchaseDate: $purchaseDate, subTotal: $subTotal, discountAmount: $discountAmount, taxableAmount: $taxableAmount, cgstAmount: $cgstAmount, sgstAmount: $sgstAmount, igstAmount: $igstAmount, taxAmount: $taxAmount, taxType: $taxType, totalAmount: $totalAmount, paidAmount: $paidAmount, dueAmount: $dueAmount, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, paymentReference: $paymentReference, notes: $notes, createdByName: $createdByName)';
 }
 
 
@@ -273,7 +283,7 @@ abstract mixin class _$PurchaseCopyWith<$Res> implements $PurchaseCopyWith<$Res>
   factory _$PurchaseCopyWith(_Purchase value, $Res Function(_Purchase) _then) = __$PurchaseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String purchaseNumber, String? invoiceNumber, String supplierName, DateTime purchaseDate, double subTotal, double discountAmount, double taxableAmount, double cgstAmount, double sgstAmount, double igstAmount, double taxAmount, String taxType, double totalAmount, String paymentStatus, String? notes, String? createdByName
+ String id, String purchaseNumber, String? invoiceNumber, String? supplierId, String supplierName, DateTime purchaseDate, double subTotal, double discountAmount, double taxableAmount, double cgstAmount, double sgstAmount, double igstAmount, double taxAmount, String taxType, double totalAmount, double paidAmount, double dueAmount, String paymentStatus, String? paymentMethod, String? paymentReference, String? notes, String? createdByName
 });
 
 
@@ -290,11 +300,12 @@ class __$PurchaseCopyWithImpl<$Res>
 
 /// Create a copy of Purchase
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? purchaseNumber = null,Object? invoiceNumber = freezed,Object? supplierName = null,Object? purchaseDate = null,Object? subTotal = null,Object? discountAmount = null,Object? taxableAmount = null,Object? cgstAmount = null,Object? sgstAmount = null,Object? igstAmount = null,Object? taxAmount = null,Object? taxType = null,Object? totalAmount = null,Object? paymentStatus = null,Object? notes = freezed,Object? createdByName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? purchaseNumber = null,Object? invoiceNumber = freezed,Object? supplierId = freezed,Object? supplierName = null,Object? purchaseDate = null,Object? subTotal = null,Object? discountAmount = null,Object? taxableAmount = null,Object? cgstAmount = null,Object? sgstAmount = null,Object? igstAmount = null,Object? taxAmount = null,Object? taxType = null,Object? totalAmount = null,Object? paidAmount = null,Object? dueAmount = null,Object? paymentStatus = null,Object? paymentMethod = freezed,Object? paymentReference = freezed,Object? notes = freezed,Object? createdByName = freezed,}) {
   return _then(_Purchase(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,purchaseNumber: null == purchaseNumber ? _self.purchaseNumber : purchaseNumber // ignore: cast_nullable_to_non_nullable
 as String,invoiceNumber: freezed == invoiceNumber ? _self.invoiceNumber : invoiceNumber // ignore: cast_nullable_to_non_nullable
+as String?,supplierId: freezed == supplierId ? _self.supplierId : supplierId // ignore: cast_nullable_to_non_nullable
 as String?,supplierName: null == supplierName ? _self.supplierName : supplierName // ignore: cast_nullable_to_non_nullable
 as String,purchaseDate: null == purchaseDate ? _self.purchaseDate : purchaseDate // ignore: cast_nullable_to_non_nullable
 as DateTime,subTotal: null == subTotal ? _self.subTotal : subTotal // ignore: cast_nullable_to_non_nullable
@@ -306,8 +317,12 @@ as double,igstAmount: null == igstAmount ? _self.igstAmount : igstAmount // igno
 as double,taxAmount: null == taxAmount ? _self.taxAmount : taxAmount // ignore: cast_nullable_to_non_nullable
 as double,taxType: null == taxType ? _self.taxType : taxType // ignore: cast_nullable_to_non_nullable
 as String,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,paidAmount: null == paidAmount ? _self.paidAmount : paidAmount // ignore: cast_nullable_to_non_nullable
+as double,dueAmount: null == dueAmount ? _self.dueAmount : dueAmount // ignore: cast_nullable_to_non_nullable
 as double,paymentStatus: null == paymentStatus ? _self.paymentStatus : paymentStatus // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,paymentMethod: freezed == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as String?,paymentReference: freezed == paymentReference ? _self.paymentReference : paymentReference // ignore: cast_nullable_to_non_nullable
+as String?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdByName: freezed == createdByName ? _self.createdByName : createdByName // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

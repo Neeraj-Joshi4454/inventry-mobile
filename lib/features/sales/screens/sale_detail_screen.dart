@@ -10,6 +10,7 @@ import '../../../core/widgets/status_badge.dart';
 import '../../customerPayments/screens/add_payment_screen.dart';
 import '../providers/sale_providers.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/widgets/payment_section.dart';
 
 class SaleDetailScreen extends ConsumerWidget {
   const SaleDetailScreen({super.key, required this.saleId});
@@ -150,7 +151,7 @@ class SaleDetailScreen extends ConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.add_card_outlined),
-                  label: const Text('Add Payment'),
+                  label: const Text('Record Repayment'),
                 ),
               ],
               const SizedBox(height: 16),
@@ -171,7 +172,7 @@ class SaleDetailScreen extends ConsumerWidget {
                         ListTile(
                           title: Text(Formatters.currency(payment.amount)),
                           subtitle: Text(
-                            '${payment.method} · ${Formatters.date(payment.paymentDate)}'
+                            '${paymentModeLabel(payment.method)} · ${Formatters.date(payment.paymentDate)}'
                             '${payment.referenceNumber != null ? ' · Ref ${payment.referenceNumber}' : ''}'
                             '${payment.notes != null && payment.notes!.isNotEmpty ? ' · ${payment.notes}' : ''}',
                           ),

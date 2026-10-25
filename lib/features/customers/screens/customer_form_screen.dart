@@ -8,6 +8,7 @@ import '../../../core/widgets/app_text_field.dart';
 import '../data/models/customer.dart';
 import '../providers/customer_providers.dart';
 import '../../../core/widgets/brand_app_bar.dart';
+import '../../../core/utils/page_padding.dart';
 
 /// Handles both "add" (existing == null) and "edit" (existing != null) —
 /// same fields, same validation, just a different submit action and title.
@@ -85,7 +86,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: pagePadding(context),
           children: [
             AppTextField(
               label: 'Name',

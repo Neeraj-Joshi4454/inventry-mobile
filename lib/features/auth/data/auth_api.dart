@@ -26,6 +26,31 @@ class AuthApi {
     }
   }
 
+  /// Submits a self-service business registration for admin review. No
+  /// account exists — and nothing is signed in — until it's approved.
+  Future<void> register({
+    required String businessName,
+    required String ownerName,
+    required String mobileNumber,
+    String? email,
+    required String password,
+  }) async {
+    try {
+      await _dio.post<Map<String, dynamic>>(
+        ApiConstants.registrations,
+        data: {
+          'businessName': businessName,
+          'ownerName': ownerName,
+          'mobileNumber': mobileNumber,
+          'email': ?email,
+          'password': password,
+        },
+      );
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
   Future<AuthTokens> refresh(String refreshToken) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(

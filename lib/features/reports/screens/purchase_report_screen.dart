@@ -171,7 +171,6 @@ class _PurchaseReportScreenState extends ConsumerState<PurchaseReportScreen> {
           SummaryCardGrid(
             cards: [
               SummaryCard(label: 'Total Purchases', value: '${summary.totalPurchases}'),
-              SummaryCard(label: 'Qty Purchased', value: Formatters.quantity(summary.totalQuantityPurchased)),
               SummaryCard(
                 label: 'Net Amount',
                 value: Formatters.currency(summary.netPurchaseAmount),
