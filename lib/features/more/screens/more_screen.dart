@@ -50,11 +50,14 @@ class MoreScreen extends ConsumerWidget {
           SettingsGroup(
             title: 'Settings & data',
             children: [
-              SettingsListItem(
-                icon: Icons.percent_outlined,
-                title: 'Tax settings',
-                onTap: () => context.push('/taxes'),
-              ),
+              // Tax settings is hidden from the menu for now (tester request) —
+              // kept commented rather than removed so it can be re-enabled.
+              // The '/taxes' route and screen are untouched.
+              // SettingsListItem(
+              //   icon: Icons.percent_outlined,
+              //   title: 'Tax settings',
+              //   onTap: () => context.push('/taxes'),
+              // ),
               SettingsListItem(
                 icon: Icons.storefront_outlined,
                 title: 'Business settings',
