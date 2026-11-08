@@ -8,6 +8,7 @@ import '../../../core/network/dio_client.dart';
 import '../../../core/storage/token_storage.dart';
 import '../data/auth_api.dart';
 import '../data/auth_repository.dart';
+import '../data/models/auth_user.dart';
 import 'auth_state.dart';
 
 final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());
@@ -61,11 +62,36 @@ class AuthNotifier extends Notifier<AuthState> {
         state = const AuthState.unauthenticated();
         return;
       }
-      final user = await repo.fetchCurrentUser();
+      final user = await _fetchCurrentUserWithRetry(repo);
       state = AuthState.authenticated(user);
+    } on ApiException catch (e) {
+      if (e.type == ApiErrorType.unauthorized || e.type == ApiErrorType.forbidden) {
+        await repo.clearLocalSession().catchError((_) {});
+        state = const AuthState.unauthenticated();
+        return;
+      }
+      // Couldn't reach the server (offline, or it's slow to wake) — that
+      // says nothing about the session, so keep the stored tokens: the
+      // next launch, or signing in again, picks up from here.
+      if (state case AuthUnauthenticated()) return; // interceptor already ended it
+      state = AuthState.error('Could not reach the server. ${e.message}');
     } catch (_) {
       await repo.clearLocalSession().catchError((_) {});
       state = const AuthState.unauthenticated();
+    }
+  }
+
+  /// `/auth/me`, retried a couple of times on connection problems only —
+  /// a flaky network at launch shouldn't land the user on the login screen.
+  Future<AuthUser> _fetchCurrentUserWithRetry(AuthRepository repo) async {
+    for (var attempt = 1; ; attempt++) {
+      try {
+        return await repo.fetchCurrentUser();
+      } on ApiException catch (e) {
+        final transient = e.type == ApiErrorType.network || e.type == ApiErrorType.timeout;
+        if (!transient || attempt == 3) rethrow;
+        await Future<void>.delayed(Duration(seconds: 2 * attempt));
+      }
     }
   }
 

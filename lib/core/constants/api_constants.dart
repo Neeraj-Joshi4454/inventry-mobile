@@ -7,15 +7,19 @@ class ApiConstants {
 
   static const String _override = String.fromEnvironment('API_BASE_URL');
 
-  static const String _production =
-      'https://inventry-backend-yy05.onrender.com/api/v1';
+  static const String _production = 'https://inventry-backend-yy05.onrender.com/api/v1';
 
-  static String get baseUrl =>
-      _override.isNotEmpty ? _override : _production;
+  static String get baseUrl => _override.isNotEmpty ? _override : _production;
 
   static const Duration connectTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
-  static const Duration sendTimeout = Duration(seconds: 15);
+  // The hosted backend sleeps when idle and takes up to about a minute to
+  // answer its first request after waking; connectTimeout still catches
+  // "no network" quickly.
+  static const Duration receiveTimeout = Duration(seconds: 60);
+  static const Duration sendTimeout = Duration(seconds: 30);
+
+  /// For the session refresh, which must not give up while the server wakes.
+  static const Duration wakeUpTimeout = Duration(seconds: 90);
 
   // Auth endpoints
   static const String login = '/auth/login';
