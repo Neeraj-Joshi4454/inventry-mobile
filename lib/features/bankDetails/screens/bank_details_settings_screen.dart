@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/api_exception.dart';
+
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -69,10 +71,20 @@ class _BankDetailsSettingsScreenState extends ConsumerState<BankDetailsSettingsS
         );
     if (!mounted) return;
     setState(() => _saving = false);
-    final failed = ref.read(bankDetailsProvider).hasError;
+    final error = ref.read(bankDetailsProvider).error;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(failed ? 'Could not save bank details' : 'Bank details saved')));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            error == null
+                ? 'Bank details saved'
+                : error is ApiException
+                ? error.message
+                : 'Could not save bank details',
+          ),
+        ),
+      );
   }
 
   @override
@@ -94,7 +106,7 @@ class _BankDetailsSettingsScreenState extends ConsumerState<BankDetailsSettingsS
                     children: [
                       Text(
                         'Shown to customers on New Sale when they pay by bank transfer. '
-                        'Stored securely on this phone only.',
+                        'Saved to your business account, so they show on every phone you sign in on.',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: AppSpacing.lg),

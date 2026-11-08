@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,5 +45,22 @@ void main() {
     await store.remove('tenantA');
     expect(await store.load('tenantA'), isNull);
     expect(await (await store.load('tenantB'))!.readAsString(), 'B');
+  });
+
+  test('a server copy keeps the server timestamp, so the cache knows it is current', () async {
+    final serverStamp = DateTime.utc(2026, 11, 8, 10, 30);
+    final saved = await store.saveBytes('t1', Uint8List.fromList([1, 2, 3]), ext: 'png', stamp: serverStamp);
+    expect(store.stampOf('t1', saved)!.millisecondsSinceEpoch, serverStamp.millisecondsSinceEpoch);
+    expect(await (await store.load('t1'))!.readAsBytes(), [1, 2, 3]);
+  });
+
+  test('sync marker is per business and survives replacing the image', () async {
+    expect(await store.isSynced('tenantA'), isFalse);
+    await store.markSynced('tenantA');
+    await store.save('tenantA', await image('a.png', 'A'));
+    expect(await store.isSynced('tenantA'), isTrue);
+    expect(await store.isSynced('tenantB'), isFalse);
+    // The marker is never mistaken for the image itself.
+    expect(await (await store.load('tenantA'))!.readAsString(), 'A');
   });
 }

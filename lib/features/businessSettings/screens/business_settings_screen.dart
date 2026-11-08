@@ -217,8 +217,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
   }
 }
 
-/// Logo picker for invoices. Stored only on this phone (like the UPI QR),
-/// so it applies to invoices generated on this device.
+/// Logo picker for invoices. Saved to the business account (like the UPI
+/// QR), so invoices from every phone carry it.
 class _BusinessLogoSection extends ConsumerStatefulWidget {
   const _BusinessLogoSection();
 
@@ -275,7 +275,7 @@ class _BusinessLogoSectionState extends ConsumerState<_BusinessLogoSection> {
                   Text('Business logo', style: textTheme.titleSmall),
                   const SizedBox(height: 2),
                   Text(
-                    logo == null ? 'Shown at the top of your invoices' : 'Printed on invoices from this phone',
+                    logo == null ? 'Shown at the top of your invoices' : 'Printed on your invoices',
                     style: textTheme.bodySmall,
                   ),
                   const SizedBox(height: AppSpacing.sm),

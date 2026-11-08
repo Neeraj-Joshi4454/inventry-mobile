@@ -52,7 +52,7 @@ class _UpiQrSettingsScreenState extends ConsumerState<UpiQrSettingsScreen> {
         children: [
           Text(
             'Upload the UPI QR code customers scan to pay you. It appears on the New Sale screen when UPI is '
-            'selected. The image is stored only on this phone.',
+            'selected. It is saved to your business account, so it shows on every phone you sign in on.',
             style: textTheme.bodySmall,
           ),
           const SizedBox(height: AppSpacing.lg),

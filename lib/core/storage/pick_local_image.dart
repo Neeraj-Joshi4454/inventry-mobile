@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../network/api_exception.dart';
+
 import 'local_image_provider.dart';
 
 /// Lets the user choose an image from their photos and saves it into the
@@ -16,7 +18,7 @@ import 'local_image_provider.dart';
 Future<String?> pickAndSaveLocalImage(WidgetRef ref, String folder, {required String savedMessage}) async {
   final XFile? picked;
   try {
-    picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1600, imageQuality: 92);
+    picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1200, imageQuality: 85);
   } on MissingPluginException {
     // The picker's native code isn't in the installed build — happens after
     // hot reload/restart when the plugin was added later.
@@ -34,7 +36,7 @@ Future<String?> pickAndSaveLocalImage(WidgetRef ref, String folder, {required St
   final error = ref.read(provider).error;
   if (error != null) {
     debugPrint('Image save failed: $error');
-    return 'Could not save the image. Please try again.';
+    return error is ApiException ? error.message : 'Could not save the image. Please try again.';
   }
   return savedMessage;
 }
